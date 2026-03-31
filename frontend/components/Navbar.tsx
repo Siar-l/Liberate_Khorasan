@@ -2,11 +2,37 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
   const pathname = usePathname();
+
+  useEffect(() => {
+    let lastY = window.scrollY;
+
+    const onScroll = () => {
+      const currentY = window.scrollY;
+      const scrollingDown = currentY > lastY;
+      const passedThreshold = currentY > 80;
+
+      if (scrollingDown && passedThreshold) {
+        setIsVisible(false);
+        setIsOpen(false);
+      } else {
+        setIsVisible(true);
+      }
+
+      lastY = currentY;
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, []);
 
   const locale: "fa" | "en" = pathname?.startsWith("/en/") || pathname === "/en" ? "en" : "fa";
   const isFa = locale === "fa";
@@ -51,14 +77,19 @@ export default function Navbar() {
 
   const languageOrderClass = isFa ? "md:order-1" : "md:order-2";
   const menuOrderClass = isFa ? "md:order-2" : "md:order-1";
+  const menuDirectionClass = isFa ? "md:flex-row-reverse" : "md:flex-row";
 
   return (
-    <nav className="bg-braun-800 p-4 sticky top-0 z-50">
-      <div className="flex text-red-500 text-lg md:text-xl font-bold justify-center mb-4">
-        <div className="text-red text-xl font-bold calibri">{labels.brand}</div>
+    <nav
+      className={`sticky top-0 z-50 bg-braun-800 p-4 transition-transform duration-300 ${
+        isVisible ? "translate-y-0" : "-translate-y-full"
+      }`}
+    >
+      <div className="mb-4 flex justify-center text-center text-red-500 text-base font-bold sm:text-lg md:text-xl">
+        <div className="text-red font-bold calibri break-words">{labels.brand}</div>
       </div>
 
-      <div className="container mx-auto">
+      <div className="container mx-auto max-w-6xl">
         <div className="flex items-center justify-between">
           <div className={`group relative text-red text-sm ${languageOrderClass}`}>
             <button type="button" className="cursor-pointer">{labels.language}</button>
@@ -81,7 +112,7 @@ export default function Navbar() {
           </div>
 
           {/* Desktop Menu */}
-          <div className={`hidden md:flex space-x-4 ${menuOrderClass}`}>
+          <div className={`hidden md:flex md:flex-wrap md:items-center md:gap-x-4 md:gap-y-2 ${menuOrderClass} ${menuDirectionClass}`}>
             <Link href="/" className="text-brown hover:text-gray-300">{labels.home}</Link>
             <Link href={`/${locale}/about`} className="text-brown hover:text-gray-300">{labels.about}</Link>
             <Link href={`/${locale}/announcements`} className="text-brown hover:text-gray-300">{labels.announcements}</Link>

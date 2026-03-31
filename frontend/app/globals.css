@@ -26,6 +26,38 @@ body {
   font-family: Shabnam, Tahoma, Arial, sans-serif;
 }
 
+html,
+body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+img,
+video,
+canvas,
+svg {
+  max-width: 100%;
+  height: auto;
+}
+
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+a,
+span {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
 .font-shabnam {
   font-family: Shabnam, Tahoma, Arial, sans-serif;
 }
