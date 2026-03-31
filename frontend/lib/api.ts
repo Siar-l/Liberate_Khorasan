@@ -1,7 +1,7 @@
-const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL;
+const NEXT_PUBLIC_STRAPI_URL = "https://liberate-khorasan-7.onrender.com";
 
 export async function fetchAPI(path: string) {
-  const res = await fetch(`${STRAPI_URL}${path}`, {
+  const res = await fetch(`${NEXT_PUBLIC_STRAPI_URL}${path}`, {
     next: { revalidate: 60 },
   });
 
