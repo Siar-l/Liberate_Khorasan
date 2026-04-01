@@ -51,7 +51,7 @@ export default function AnnouncementCard({
         href={`/${locale}/announcements/${announcement.slug}`}
         className="mt-5 inline-block rounded-2xl bg-gray-900 px-5 py-3 text-sm font-medium text-white transition hover:opacity-90"
       >
-        {isFa ? "مشاهده جزئیات" : "View Details"}
+        {isFa ? "ادامه مطلب " : "View Details"}
       </Link>
       </div>
     </article>

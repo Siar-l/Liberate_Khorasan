@@ -23,7 +23,7 @@ export async function getArticleBySlug(
   slug: string
 ) {
   return fetchAPI(
-    `/api/articles?filters[slug][$eq]=${slug}&locale=${locale}&populate=*`
+    `/api/articles?filters[slug][$eq]=${encodeURIComponent(slug)}&locale=${locale}&populate=*`
   );
 }
 
@@ -38,7 +38,7 @@ export async function getAnnouncementBySlug(
   slug: string
 ) {
   return fetchAPI(
-    `/api/announcements?filters[slug][$eq]=${slug}&locale=${locale}&populate=*`
+    `/api/announcements?filters[slug][$eq]=${encodeURIComponent(slug)}&locale=${locale}&populate=*`
   );
 }
 
@@ -48,6 +48,6 @@ export async function getCultures(locale: "fa" | "en") {
 
 export async function getCultureBySlug(locale: "fa" | "en", slug: string) {
   return fetchAPI(
-    `/api/cultures?filters[slug][$eq]=${slug}&locale=${locale}&populate=*`
+    `/api/cultures?filters[slug][$eq]=${encodeURIComponent(slug)}&locale=${locale}&populate=*`
   );
 }

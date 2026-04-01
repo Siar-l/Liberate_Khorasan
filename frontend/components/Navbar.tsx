@@ -2,17 +2,43 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
+  const [isLanguageOpen, setIsLanguageOpen] = useState(false);
   const pathname = usePathname();
+  const languageMenuRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    setIsLanguageOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    const onPointerDown = (event: MouseEvent) => {
+      const target = event.target as Node;
+      if (!languageMenuRef.current?.contains(target)) {
+        setIsLanguageOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", onPointerDown);
+    return () => {
+      document.removeEventListener("mousedown", onPointerDown);
+    };
+  }, []);
 
   useEffect(() => {
     let lastY = window.scrollY;
 
     const onScroll = () => {
+      const isDesktop = window.innerWidth >= 768;
+      if (!isDesktop) {
+        setIsVisible(true);
+        return;
+      }
+
       const currentY = window.scrollY;
       const scrollingDown = currentY > lastY;
       const passedThreshold = currentY > 80;
@@ -45,7 +71,7 @@ export default function Navbar() {
         en: "English/انگلیسی",
         home: "خانه",
         about: "درباره ما",
-        announcements: "اطلاعیه ها",
+        announcements: "اعلامیه ها",
         articles: "مقاله ها",
         contact: "تماس با ما",
         cultural: "فرهنگی",
@@ -59,7 +85,7 @@ export default function Navbar() {
         about: "About",
         announcements: "Announcements",
         articles: "Articles",
-        contact: "Contact",
+        contact: " Contact Us",
         cultural: "Culture",
       };
 
@@ -78,6 +104,7 @@ export default function Navbar() {
   const languageOrderClass = isFa ? "md:order-1" : "md:order-2";
   const menuOrderClass = isFa ? "md:order-2" : "md:order-1";
   const menuDirectionClass = isFa ? "md:flex-row-reverse" : "md:flex-row";
+  const closeMobileMenu = () => setIsOpen(false);
 
   return (
     <nav
@@ -91,19 +118,33 @@ export default function Navbar() {
 
       <div className="container mx-auto max-w-6xl">
         <div className="flex items-center justify-between">
-          <div className={`group relative text-red text-sm ${languageOrderClass}`}>
-            <button type="button" className="cursor-pointer">{labels.language}</button>
-            <div className="absolute left-0 top-full hidden w-32 pt-1 group-hover:block group-focus-within:block">
+          <div ref={languageMenuRef} className={`group relative text-red text-sm ${languageOrderClass}`}>
+            <button
+              type="button"
+              className="cursor-pointer"
+              onClick={() => setIsLanguageOpen((prev) => !prev)}
+              aria-expanded={isLanguageOpen}
+              aria-haspopup="menu"
+            >
+              {labels.language}
+            </button>
+            <div
+              className={`absolute left-0 top-full w-32 pt-1 ${
+                isLanguageOpen ? "block" : "hidden"
+              } md:group-hover:block md:group-focus-within:block`}
+            >
               <div className="rounded-md bg-white p-2 shadow-lg">
                 <Link
                   href={getLanguageHref("fa")}
                   className="block rounded px-2 py-1 text-sm text-gray-800 hover:bg-gray-100"
+                  onClick={() => setIsLanguageOpen(false)}
                 >
                   {labels.fa}
                 </Link>
                 <Link
                   href={getLanguageHref("en")}
                   className="block rounded px-2 py-1 text-sm text-gray-800 hover:bg-gray-100"
+                  onClick={() => setIsLanguageOpen(false)}
                 >
                   {labels.en}
                 </Link>
@@ -114,10 +155,10 @@ export default function Navbar() {
           {/* Desktop Menu */}
           <div className={`hidden md:flex md:flex-wrap md:items-center md:gap-x-4 md:gap-y-2 ${menuOrderClass} ${menuDirectionClass}`}>
             <Link href="/" className="text-brown hover:text-gray-300">{labels.home}</Link>
-            <Link href={`/${locale}/about`} className="text-brown hover:text-gray-300">{labels.about}</Link>
             <Link href={`/${locale}/announcements`} className="text-brown hover:text-gray-300">{labels.announcements}</Link>
             <Link href={`/${locale}/articles`} className="text-brown hover:text-gray-300">{labels.articles}</Link>
             <Link href={`/${locale}/contact`} className="text-brown hover:text-gray-300">{labels.contact}</Link>
+             <Link href={`/${locale}/about`} className="text-brown hover:text-gray-300">{labels.about}</Link>
             <Link href={`/${locale}/culture`} className="text-brown hover:text-gray-300">{labels.cultural}</Link>
           </div>
 
@@ -133,12 +174,12 @@ export default function Navbar() {
         {/* Mobile Menu */}
         {isOpen && (
           <div className="md:hidden mt-4 flex flex-col space-y-2 pb-4">
-            <Link href="/" className="block text-brown hover:text-gray-300 py-2">{labels.home}</Link>
-            <Link href={`/${locale}/about`} className="block text-brown hover:text-gray-300 py-2">{labels.about}</Link>
-            <Link href={`/${locale}/announcements`} className="block text-brown hover:text-gray-300 py-2">{labels.announcements}</Link>
-            <Link href={`/${locale}/articles`} className="block text-brown hover:text-gray-300 py-2">{labels.articles}</Link>
-            <Link href={`/${locale}/contact`} className="block text-brown hover:text-gray-300 py-2">{labels.contact}</Link>
-            <Link href={`/${locale}/culture`} className="block text-brown hover:text-gray-300 py-2">{labels.cultural}</Link>
+            <Link href="/" onClick={closeMobileMenu} className="block text-brown hover:text-gray-300 py-2">{labels.home}</Link>
+            <Link href={`/${locale}/about`} onClick={closeMobileMenu} className="block text-brown hover:text-gray-300 py-2">{labels.about}</Link>
+            <Link href={`/${locale}/announcements`} onClick={closeMobileMenu} className="block text-brown hover:text-gray-300 py-2">{labels.announcements}</Link>
+            <Link href={`/${locale}/articles`} onClick={closeMobileMenu} className="block text-brown hover:text-gray-300 py-2">{labels.articles}</Link>
+            <Link href={`/${locale}/contact`} onClick={closeMobileMenu} className="block text-brown hover:text-gray-300 py-2">{labels.contact}</Link>
+            <Link href={`/${locale}/culture`} onClick={closeMobileMenu} className="block text-brown hover:text-gray-300 py-2">{labels.cultural}</Link>
           </div>
         )}
       </div>
