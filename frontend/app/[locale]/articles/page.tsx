@@ -17,6 +17,11 @@ const readField = (item: StrapiItem, key: string): unknown => {
   return undefined;
 };
 
+const isLocaleMatch = (item: StrapiItem, locale: "fa" | "en"): boolean => {
+  const itemLocale = readField(item, "locale");
+  return typeof itemLocale !== "string" || itemLocale === locale;
+};
+
 const extractMediaUrl = (value: unknown): string | undefined => {
   const getUrl = (source: unknown): string | undefined => {
     if (!source || typeof source !== "object") return undefined;
@@ -57,7 +62,7 @@ export default async function ArticlesPage({ params }: ArticlesPageProps) {
     const response = await getArticles(locale);
     const data = (response as { data?: unknown }).data;
     if (Array.isArray(data)) {
-      items = data as StrapiItem[];
+      items = (data as StrapiItem[]).filter((item) => isLocaleMatch(item, locale));
     }
   } catch {
     items = [];

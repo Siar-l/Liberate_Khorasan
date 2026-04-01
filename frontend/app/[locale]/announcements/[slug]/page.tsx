@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { getAnnouncementBySlug, STRAPI_URL } from "@/lib/api";
+import { getAnnouncementByIdentifier, STRAPI_URL } from "@/lib/api";
 
 type AnnouncementDetailPageProps = {
   params: Promise<{ locale: "fa" | "en"; slug: string }>;
@@ -52,7 +52,7 @@ export default async function AnnouncementDetailPage({ params }: AnnouncementDet
   let item: StrapiItem | null = null;
 
   try {
-    const response = await getAnnouncementBySlug(locale, slug);
+    const response = await getAnnouncementByIdentifier(locale, slug);
     const data = (response as { data?: unknown }).data;
     if (Array.isArray(data) && data.length > 0) {
       item = data[0] as StrapiItem;

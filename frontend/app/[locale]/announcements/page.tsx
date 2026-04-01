@@ -17,6 +17,11 @@ const readField = (item: StrapiItem, key: string): unknown => {
   return undefined;
 };
 
+const isLocaleMatch = (item: StrapiItem, locale: "fa" | "en"): boolean => {
+  const itemLocale = readField(item, "locale");
+  return typeof itemLocale !== "string" || itemLocale === locale;
+};
+
 const extractMediaUrl = (value: unknown): string | undefined => {
   const getUrl = (source: unknown): string | undefined => {
     if (!source || typeof source !== "object") return undefined;
@@ -54,7 +59,7 @@ export default async function AnnouncementsPage({ params }: AnnouncementsPagePro
     const response = await getAnnouncements(locale);
     const data = (response as { data?: unknown }).data;
     if (Array.isArray(data)) {
-      items = data as StrapiItem[];
+      items = (data as StrapiItem[]).filter((item) => isLocaleMatch(item, locale));
     }
   } catch {
     items = [];
@@ -84,7 +89,10 @@ export default async function AnnouncementsPage({ params }: AnnouncementsPagePro
           {items.map((item) => {
             const title = (readField(item, "title") as string | undefined) ?? (isFa ? "بدون عنوان" : "Untitled");
             const excerpt = (readField(item, "excerpt") as string | undefined) ?? "";
-            const slug = (readField(item, "slug") as string | undefined) ?? String(item.id);
+            const slug =
+              (readField(item, "slug") as string | undefined) ??
+              (readField(item, "documentId") as string | undefined) ??
+              String(item.id);
             const type = (readField(item, "type") as string | undefined) ?? (isFa ? "اطلاعیه" : "Announcement");
             const date =
               (readField(item, "publishedAtCustom") as string | undefined) ??

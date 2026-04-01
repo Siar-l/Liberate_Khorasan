@@ -42,6 +42,33 @@ export async function getAnnouncementBySlug(
   );
 }
 
+export async function getAnnouncementByIdentifier(
+  locale: "fa" | "en",
+  identifier: string
+) {
+  const bySlug = await getAnnouncementBySlug(locale, identifier);
+  const bySlugData = (bySlug as { data?: unknown }).data;
+  if (Array.isArray(bySlugData) && bySlugData.length > 0) {
+    return bySlug;
+  }
+
+  const byDocumentId = await fetchAPI(
+    `/api/announcements?filters[documentId][$eq]=${encodeURIComponent(identifier)}&locale=${locale}&populate=*`
+  );
+  const byDocumentIdData = (byDocumentId as { data?: unknown }).data;
+  if (Array.isArray(byDocumentIdData) && byDocumentIdData.length > 0) {
+    return byDocumentId;
+  }
+
+  if (/^\d+$/.test(identifier)) {
+    return fetchAPI(
+      `/api/announcements?filters[id][$eq]=${identifier}&locale=${locale}&populate=*`
+    );
+  }
+
+  return bySlug;
+}
+
 export async function getCultures(locale: "fa" | "en") {
   return fetchAPI(`/api/cultures?locale=${locale}&populate=*`);
 }
