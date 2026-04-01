@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   CULTURAL_EVENTS_STORAGE_KEY,
   parseEvents,
@@ -25,6 +26,7 @@ const labels = {
   fa: {
     pageTitle: "مدیریت رویدادهای فرهنگی",
     subtitle: "رویداد جدید ثبت کنید تا در صفحه فرهنگ نمایش داده شود.",
+    logout: "خروج",
     title: "عنوان رویداد",
     date: "تاریخ",
     location: "مکان",
@@ -36,6 +38,7 @@ const labels = {
   en: {
     pageTitle: "Cultural Events Admin",
     subtitle: "Post a new event and it will appear on the culture page.",
+    logout: "Logout",
     title: "Event title",
     date: "Date",
     location: "Location",
@@ -57,9 +60,16 @@ export default function CultureAdminPage({ params }: CultureAdminPageProps) {
   const locale: Locale = params.locale === "fa" ? "fa" : "en";
   const isFa = locale === "fa";
   const t = labels[locale];
+  const router = useRouter();
 
   const [form, setForm] = useState<FormState>(initialForm);
   const [events, setEvents] = useState<CulturalEvent[]>([]);
+
+  const onLogout = async () => {
+    await fetch("/api/culture-auth/logout", { method: "POST" });
+    router.push(`/${locale}/culture/admin/login`);
+    router.refresh();
+  };
 
   useEffect(() => {
     setEvents(parseEvents(localStorage.getItem(CULTURAL_EVENTS_STORAGE_KEY)));
@@ -92,7 +102,16 @@ export default function CultureAdminPage({ params }: CultureAdminPageProps) {
   return (
     <main dir={isFa ? "rtl" : "ltr"} className="min-h-screen bg-gray-100 px-5 py-10 sm:px-8">
       <section className="mx-auto w-full max-w-4xl rounded-3xl bg-white p-6 shadow-sm sm:p-8">
-        <h1 className="text-3xl font-bold text-gray-900">{t.pageTitle}</h1>
+        <div className="flex items-start justify-between gap-4">
+          <h1 className="text-3xl font-bold text-gray-900">{t.pageTitle}</h1>
+          <button
+            type="button"
+            onClick={onLogout}
+            className="rounded-xl border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
+          >
+            {t.logout}
+          </button>
+        </div>
         <p className="mt-2 text-gray-600">{t.subtitle}</p>
 
         <form className="mt-8 grid gap-4" onSubmit={onSubmit}>
