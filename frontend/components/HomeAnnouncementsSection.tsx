@@ -20,7 +20,7 @@ const readField = (item: StrapiItem, key: string): unknown => {
 
 const isLocaleMatch = (item: StrapiItem, locale: "fa" | "en"): boolean => {
 	const itemLocale = readField(item, "locale");
-	return typeof itemLocale !== "string" || itemLocale === locale;
+	return typeof itemLocale === "string" && itemLocale === locale;
 };
 
 const extractMediaUrl = (value: unknown): string | undefined => {

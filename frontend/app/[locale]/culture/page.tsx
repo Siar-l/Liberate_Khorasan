@@ -50,6 +50,11 @@ const readField = (item: StrapiCultureItem, key: string): unknown => {
   return undefined;
 };
 
+const isLocaleMatch = (item: StrapiCultureItem, locale: "fa" | "en"): boolean => {
+  const itemLocale = readField(item, "locale");
+  return typeof itemLocale === "string" && itemLocale === locale;
+};
+
 const extractMediaUrl = (value: unknown): string | undefined => {
   const getUrl = (source: unknown): string | undefined => {
     if (!source || typeof source !== "object") return undefined;
@@ -96,7 +101,7 @@ export default async function CulturePage({ params }: CulturePageProps) {
     const response = await getCultures(locale);
     const data = (response as { data?: unknown }).data;
     if (isStrapiCultureArray(data)) {
-      cultures = data;
+      cultures = data.filter((item) => isLocaleMatch(item, locale));
     }
   } catch {
     cultures = [];
@@ -149,7 +154,7 @@ export default async function CulturePage({ params }: CulturePageProps) {
 
         <div className="mt-10 rounded-3xl border border-gray-200 bg-white p-5 shadow-sm sm:p-8">
           <h2 className="text-2xl font-semibold">
-            {isFa ? "مطالب فرهنگی از استرپی" : "Cultural Articles from Strapi"}
+            {isFa ? "مطالب فرهنگی " : "Cultural Articles from"}
           </h2>
 
           {cultures.length === 0 ? (
