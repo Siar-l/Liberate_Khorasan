@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
-import { getArticleBySlug, STRAPI_URL } from "@/lib/api";
+import { getAnnouncementBySlug, STRAPI_URL } from "@/lib/api";
 
-type ArticleDetailPageProps = {
+type AnnouncementDetailPageProps = {
   params: Promise<{ locale: "fa" | "en"; slug: string }>;
 };
 
@@ -45,42 +45,37 @@ const toAbsoluteUrl = (url: string | undefined): string | undefined => {
   return `${STRAPI_URL}${url}`;
 };
 
-export default async function ArticleDetailPage({
-  params,
-}: ArticleDetailPageProps) {
+export default async function AnnouncementDetailPage({ params }: AnnouncementDetailPageProps) {
   const { locale, slug } = await params;
+  const isFa = locale === "fa";
 
-  let article: StrapiItem | null = null;
+  let item: StrapiItem | null = null;
 
   try {
-    const response = await getArticleBySlug(locale, slug);
+    const response = await getAnnouncementBySlug(locale, slug);
     const data = (response as { data?: unknown }).data;
     if (Array.isArray(data) && data.length > 0) {
-      article = data[0] as StrapiItem;
+      item = data[0] as StrapiItem;
     }
   } catch {
-    article = null;
+    item = null;
   }
 
-  if (!article) {
+  if (!item) {
     notFound();
   }
 
-  const isFa = locale === "fa";
-  const title = (readField(article, "title") as string | undefined) ?? (isFa ? "بدون عنوان" : "Untitled");
-  const excerpt = (readField(article, "excerpt") as string | undefined) ?? "";
-  const category = (readField(article, "category") as string | undefined) ?? (isFa ? "مقاله" : "Article");
+  const title = (readField(item, "title") as string | undefined) ?? (isFa ? "بدون عنوان" : "Untitled");
+  const excerpt = (readField(item, "excerpt") as string | undefined) ?? "";
+  const type = (readField(item, "type") as string | undefined) ?? (isFa ? "اطلاعیه" : "Announcement");
   const date =
-    (readField(article, "publishedAtCustom") as string | undefined) ??
-    (readField(article, "publishedAt") as string | undefined) ??
+    (readField(item, "publishedAtCustom") as string | undefined) ??
+    (readField(item, "publishedAt") as string | undefined) ??
     "";
-  const imageUrl = toAbsoluteUrl(extractMediaUrl(readField(article, "cover")));
+  const imageUrl = toAbsoluteUrl(extractMediaUrl(readField(item, "attachment")));
 
   return (
-    <main
-      className="mx-auto max-w-4xl px-6 py-16 md:px-10"
-      dir={isFa ? "rtl" : "ltr"}
-    >
+    <main className="mx-auto max-w-4xl px-6 py-16 md:px-10" dir={isFa ? "rtl" : "ltr"}>
       <article className="rounded-3xl border border-gray-200 bg-white p-8 shadow-sm md:p-10">
         {imageUrl ? (
           <div className="mb-8 overflow-hidden rounded-2xl border border-gray-200 bg-gray-100">
@@ -89,13 +84,11 @@ export default async function ArticleDetailPage({
         ) : null}
 
         <div className="mb-4 flex items-center justify-between gap-3 text-sm text-gray-500">
-          <span className="rounded-full bg-gray-100 px-3 py-1">{category}</span>
+          <span className="rounded-full bg-gray-100 px-3 py-1">{type}</span>
           <span>{date}</span>
         </div>
 
-        <h1 className="text-3xl font-bold leading-tight text-gray-900 md:text-4xl">
-          {title}
-        </h1>
+        <h1 className="text-3xl font-bold leading-tight text-gray-900 md:text-4xl">{title}</h1>
 
         <p className="mt-6 text-lg leading-8 text-gray-700">{excerpt}</p>
       </article>

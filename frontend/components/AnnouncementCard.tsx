@@ -9,6 +9,7 @@ type AnnouncementCardProps = {
     slug: string;
     date: string;
     type: string;
+    image?: string;
   };
 };
 
@@ -19,7 +20,18 @@ export default function AnnouncementCard({
   const isFa = locale === "fa";
 
   return (
-    <article className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md">
+    <article className="overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-md">
+      {announcement.image ? (
+        <div className="relative h-56 w-full overflow-hidden bg-gray-100">
+          <img
+            src={announcement.image}
+            alt={announcement.title}
+            className="h-full w-full object-cover"
+          />
+        </div>
+      ) : null}
+
+      <div className="p-6">
       <div className="mb-4 flex items-center justify-between gap-3 text-sm text-gray-500">
         <span className="rounded-full bg-gray-100 px-3 py-1">
           {announcement.type}
@@ -41,6 +53,7 @@ export default function AnnouncementCard({
       >
         {isFa ? "مشاهده جزئیات" : "View Details"}
       </Link>
+      </div>
     </article>
   );
 }

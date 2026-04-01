@@ -1,4 +1,5 @@
 import CultureEventsSection from "@/components/CultureEventsSection";
+import { getCultures, STRAPI_URL } from "@/lib/api";
 
 type CulturePageProps = {
   params: Promise<{
@@ -31,11 +32,75 @@ const content = {
   },
 };
 
+type StrapiCultureItem = {
+  id: number;
+  attributes?: Record<string, unknown>;
+  [key: string]: unknown;
+  title?: string;
+  excerpt?: string;
+  slug?: string;
+  category?: string;
+  publishedAtCustom?: string;
+  publishedAt?: string;
+};
+
+const readField = (item: StrapiCultureItem, key: string): unknown => {
+  if (key in item) return item[key];
+  if (item.attributes && key in item.attributes) return item.attributes[key];
+  return undefined;
+};
+
+const extractMediaUrl = (value: unknown): string | undefined => {
+  const getUrl = (source: unknown): string | undefined => {
+    if (!source || typeof source !== "object") return undefined;
+    const raw = (source as { url?: unknown }).url;
+    if (typeof raw === "string" && raw.length > 0) return raw;
+    const attrs = (source as { attributes?: { url?: unknown } }).attributes;
+    if (attrs && typeof attrs.url === "string" && attrs.url.length > 0) return attrs.url;
+    return undefined;
+  };
+
+  if (Array.isArray(value)) return getUrl(value[0]);
+
+  if (value && typeof value === "object") {
+    const data = (value as { data?: unknown }).data;
+    if (Array.isArray(data)) return getUrl(data[0]);
+    if (data && typeof data === "object") return getUrl(data);
+    return getUrl(value);
+  }
+
+  return undefined;
+};
+
+const toAbsoluteUrl = (url: string | undefined): string | undefined => {
+  if (!url) return undefined;
+  if (url.startsWith("http://") || url.startsWith("https://")) return url;
+  return `${STRAPI_URL}${url}`;
+};
+
+const isStrapiCultureArray = (value: unknown): value is StrapiCultureItem[] => {
+  if (!Array.isArray(value)) return false;
+
+  return value.every((item) => typeof item === "object" && item !== null && "id" in item);
+};
+
 export default async function CulturePage({ params }: CulturePageProps) {
   const { locale: routeLocale } = await params;
   const locale = routeLocale === "fa" ? "fa" : "en";
   const isFa = locale === "fa";
   const t = content[locale];
+
+  let cultures: StrapiCultureItem[] = [];
+
+  try {
+    const response = await getCultures(locale);
+    const data = (response as { data?: unknown }).data;
+    if (isStrapiCultureArray(data)) {
+      cultures = data;
+    }
+  } catch {
+    cultures = [];
+  }
 
   return (
     <main
@@ -81,6 +146,67 @@ export default async function CulturePage({ params }: CulturePageProps) {
         </div>
 
         <CultureEventsSection locale={locale} />
+
+        <div className="mt-10 rounded-3xl border border-gray-200 bg-white p-5 shadow-sm sm:p-8">
+          <h2 className="text-2xl font-semibold">
+            {isFa ? "مطالب فرهنگی از استرپی" : "Cultural Articles from Strapi"}
+          </h2>
+
+          {cultures.length === 0 ? (
+            <p className="mt-4 leading-8 text-gray-600">
+              {isFa
+                ? "هنوز مطلب فرهنگی منتشر شده ای در استرپی دیده نمی شود."
+                : "No published cultural content from Strapi is visible yet."}
+            </p>
+          ) : (
+            <div className="mt-6 grid gap-6 md:grid-cols-2">
+              {cultures.map((item) => {
+                const publishedDate =
+                  (readField(item, "publishedAtCustom") as string | undefined) ??
+                  (readField(item, "publishedAt") as string | undefined) ??
+                  "";
+                const title =
+                  (readField(item, "title") as string | undefined) ??
+                  (isFa ? "بدون عنوان" : "Untitled");
+                const excerpt =
+                  (readField(item, "excerpt") as string | undefined) ??
+                  (isFa
+                    ? "برای این مطلب خلاصه ای ثبت نشده است."
+                    : "No excerpt is available for this item.");
+                const category =
+                  (readField(item, "category") as string | undefined) ??
+                  (isFa ? "فرهنگ" : "Culture");
+                const imageUrl = toAbsoluteUrl(extractMediaUrl(readField(item, "cover")));
+
+                return (
+                  <article
+                    key={item.id}
+                    className="rounded-2xl border border-gray-200 bg-gray-50 p-5 sm:p-6"
+                  >
+                    {imageUrl ? (
+                      <div className="mb-4 overflow-hidden rounded-xl border border-gray-200 bg-gray-100">
+                        <img src={imageUrl} alt={title} className="h-52 w-full object-cover" />
+                      </div>
+                    ) : null}
+
+                    <div className="mb-2 flex items-center justify-between gap-3 text-sm text-gray-500">
+                      <span className="rounded-full bg-white px-3 py-1">
+                        {category}
+                      </span>
+                      <span>{publishedDate ? new Date(publishedDate).toLocaleDateString() : ""}</span>
+                    </div>
+
+                    <h3 className="text-lg font-semibold text-gray-900 sm:text-xl">
+                      {title}
+                    </h3>
+
+                    <p className="mt-3 leading-7 text-gray-700">{excerpt}</p>
+                  </article>
+                );
+              })}
+            </div>
+          )}
+        </div>
 
       </section>
     </main>
