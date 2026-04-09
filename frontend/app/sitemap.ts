@@ -85,18 +85,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "monthly",
       priority: 0.7,
     },
-    {
-      url: `${BASE_URL}/fa/culture`,
-      lastModified: now,
-      changeFrequency: "weekly",
-      priority: 0.7,
-    },
-    {
-      url: `${BASE_URL}/en/culture`,
-      lastModified: now,
-      changeFrequency: "weekly",
-      priority: 0.7,
-    },
   ];
 
   const locales: Array<"fa" | "en"> = ["fa", "en"];

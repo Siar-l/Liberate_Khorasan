@@ -74,7 +74,6 @@ export default function Navbar() {
         announcements: "اعلامیه ها",
         articles: "مقاله ها",
         contact: "تماس با ما",
-        cultural: "فرهنگی",
       }
     : {
         brand: "Liberate Khurasan",
@@ -86,7 +85,6 @@ export default function Navbar() {
         announcements: "Announcements",
         articles: "Articles",
         contact: " Contact Us",
-        cultural: "Culture",
       };
 
   const getLanguageHref = (targetLocale: "fa" | "en") => {
@@ -159,7 +157,6 @@ export default function Navbar() {
             <Link href={`/${locale}/articles`} className="text-brown hover:text-gray-300">{labels.articles}</Link>
             <Link href={`/${locale}/contact`} className="text-brown hover:text-gray-300">{labels.contact}</Link>
              <Link href={`/${locale}/about`} className="text-brown hover:text-gray-300">{labels.about}</Link>
-            <Link href={`/${locale}/culture`} className="text-brown hover:text-gray-300">{labels.cultural}</Link>
           </div>
 
           {/* Mobile Hamburger */}
@@ -179,7 +176,6 @@ export default function Navbar() {
             <Link href={`/${locale}/announcements`} onClick={closeMobileMenu} className="block text-brown hover:text-gray-300 py-2">{labels.announcements}</Link>
             <Link href={`/${locale}/articles`} onClick={closeMobileMenu} className="block text-brown hover:text-gray-300 py-2">{labels.articles}</Link>
             <Link href={`/${locale}/contact`} onClick={closeMobileMenu} className="block text-brown hover:text-gray-300 py-2">{labels.contact}</Link>
-            <Link href={`/${locale}/culture`} onClick={closeMobileMenu} className="block text-brown hover:text-gray-300 py-2">{labels.cultural}</Link>
           </div>
         )}
       </div>

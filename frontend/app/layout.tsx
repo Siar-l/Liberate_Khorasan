@@ -20,14 +20,13 @@ export const metadata: Metadata = {
     template: "%s | Liberate Khurasan",
   },
   description:
-    "Liberate Khurasan shares announcements, articles, and cultural content in Persian and English.",
+    "Liberate Khurasan shares announcements and articles in Persian and English.",
   keywords: [
     "Liberate Khurasan",
     "Khorasan",
     "Khurasan",
     "articles",
     "announcements",
-    "culture",
     "Persian",
     "English",
   ],
@@ -40,8 +39,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: "Liberate Khurasan",
-    description:
-      "Announcements, articles, and cultural content in Persian and English.",
+    description: "Announcements and articles in Persian and English.",
     url: "https://liberatekhorasan.org",
     siteName: "Liberate Khurasan",
     locale: "en_US",
@@ -50,8 +48,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Liberate Khurasan",
-    description:
-      "Announcements, articles, and cultural content in Persian and English.",
+    description: "Announcements and articles in Persian and English.",
   },
   robots: {
     index: true,

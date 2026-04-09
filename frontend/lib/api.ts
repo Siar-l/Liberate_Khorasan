@@ -68,13 +68,3 @@ export async function getAnnouncementByIdentifier(
 
   return bySlug;
 }
-
-export async function getCultures(locale: "fa" | "en") {
-  return fetchAPI(`/api/cultures?locale=${locale}&populate=*`);
-}
-
-export async function getCultureBySlug(locale: "fa" | "en", slug: string) {
-  return fetchAPI(
-    `/api/cultures?filters[slug][$eq]=${encodeURIComponent(slug)}&locale=${locale}&populate=*`
-  );
-}
